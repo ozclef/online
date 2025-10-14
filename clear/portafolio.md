@@ -1,0 +1,133 @@
+### Plantilla de Curriculum / Portafolio interactivo (HTML, CSS, JS)
+
+Aquí tienes un archivo HTML autónomo que sirve como CV/portafolio. Dispone de layout con <aside> para navegación y <main> para vistas previas. Botones permiten elegir entre archivos (HTML, .md, .css, .scss, .js, .json). El código carga archivos remotos por URL (por ejemplo raw.githubusercontent.com) y muestra:
+- Vista previa HTML en iframe.
+- Renderizado de Markdown.
+- Código con resaltado (prism.js CDN).
+- JSON formateado.
+- Opciones para abrir en nueva pestaña (GitHub Pages u otros).
+
+Copia todo a un archivo index.html y edita la lista de archivos en la constante filesList para apuntar a tus repositorios (raw URLs). Si quieres mostrar archivos privados, el navegador no podrá acceder sin credenciales; usa GitHub Pages público o exporta los archivos como públicos.
+
+Código completo:
+
+```html
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CV / Portafolio — Interactivo</title>
+
+<!-- Prism para resaltado (CDN) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+<!-- Simple Markdown renderer ligero (marked) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/5.2.12/marked.min.js"></script>
+
+<style>
+  :root{
+    --bg:#0f1720; --card:#0b1220; --muted:#9aa7b2; --accent:#6ee7b7; --panel:#0f1726;
+    --glass: rgba(255,255,255,0.03);
+    --radius:12px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#071023 0%, #071428 100%);color:#e6eef3}
+  .container{display:grid;grid-template-columns:320px 1fr;gap:20px;max-width:1200px;margin:28px auto;padding:20px}
+  aside{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:18px;border-radius:var(--radius);height:calc(100vh - 96px);overflow:auto}
+  header.top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .avatar{width:64px;height:64px;border-radius:12px;background:linear-gradient(90deg,#2dd4bf,#60a5fa);display:flex;align-items:center;justify-content:center;font-weight:700;color:#052024}
+  h1{margin:0;font-size:1.05rem}
+  p.role{margin:4px 0 12px;color:var(--muted);font-size:0.9rem}
+
+  nav .group{margin-bottom:14px}
+  .file-btn{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:8px;background:transparent;border:1px solid transparent;color:var(--accent);cursor:pointer;margin-bottom:8px}
+  .file-btn:hover{background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.03)}
+  .file-meta{font-size:0.85rem;color:var(--muted)}
+
+  main{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:var(--radius);padding:18px;height:calc(100vh - 96px);overflow:auto;border:1px solid rgba(255,255,255,0.03)}
+  .controls{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--accent);padding:8px 12px;border-radius:8px;cursor:pointer}
+  .btn.secondary{color:var(--muted);border-style:dashed}
+  .preview{background:#07101a;border-radius:10px;padding:12px;min-height:360px;border:1px solid rgba(255,255,255,0.02)}
+  .preview iframe{width:100%;height:520px;border-radius:8px;border:1px solid rgba(255,255,255,0.03)}
+  pre{background:#07101a;padding:12px;border-radius:8px;overflow:auto}
+  .meta-row{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:0.9rem;margin-bottom:8px}
+  .small{font-size:0.85rem;color:var(--muted)}
+  .open-link{margin-left:auto;color:#9be7ff;text-decoration:underline;cursor:pointer}
+  footer{margin-top:14px;color:var(--muted);font-size:0.85rem}
+  @media(max-width:900px){.container{grid-template-columns:1fr;padding:12px} aside{height:auto} main{height:auto}}
+</style>
+</head>
+<body>
+<div class="container" role="application">
+  <aside>
+    <div class="top header">
+      <div class="avatar">L</div>
+      <div>
+        <h1>Luna — Full-stack Creator</h1>
+        <p class="role">Diseño UI/UX · Web OS · Docs · Deploy · IA · Python · React</p>
+      </div>
+    </div>
+
+    <div class="meta-row">
+      <div class="small">Repositorio base:</div>
+      <a id="repoLink" class="open-link" target="_blank" rel="noopener">https://github.com/ozclef/</a>
+    </div>
+
+    <nav>
+      <div class="group">
+        <strong style="color:var(--accent)">Archivos</strong>
+        <div id="filesList" style="margin-top:8px"></div>
+      </div>
+
+      <div class="group">
+        <strong style="color:var(--accent)">Acciones</strong>
+        <div style="margin-top:8px">
+          <button class="btn" id="showAllCode">Mostrar todo el HTML gigante</button>
+          <button class="btn secondary" id="exportView">Abrir vista en nueva pestaña</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <strong style="color:var(--accent)">Personal</strong>
+        <p class="small">Incluye ejemplos de HTML, MD, CSS/SCSS, JS, JSON y enlaces a GitHub Pages. Edita la lista de archivos en el script para personalizar.</p>
+      </div>
+    </nav>
+
+    <footer>Hecho con ❤️ · Plantilla interactiva</footer>
+  </aside>
+
+  <main>
+    <div class="controls">
+      <div class="meta-row">
+        <div id="currentType" class="small">Selecciona un archivo</div>
+      </div>
+    </div>
+
+    <div id="previewArea" class="preview">
+      <div id="placeholder" style="color:var(--muted);padding:18px">
+        Selecciona un archivo desde la izquierda para ver vista previa, código o renderizado.
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* --------------------------------------------------------------------------
+  CONFIGURA AQUÍ tus archivos. Usa raw.githubusercontent.com para repos públicos.
+  Ejemplos:
+    - HTML: https://raw.githubusercontent.com/usuario/repo/branch/path/file.html
+    - MD:   https://raw.githubusercontent.com/usuario/repo/branch/path/README.md
+    - CSS/JS/JSON: igual
+--------------------------------------------------------------------------*/
+const filesListData = [
+  {name: "index.html (demo)", url: "https://raw.githubusercontent.com/ozclef/ozclef/main/index.html", type: "html"},
+  {name: "README.md", url: "https://raw.githubusercontent.com/ozclef/ozclef/main/README.md", type: "md"},
+  {name: "styles.scss", url: "https://raw.githubusercontent.com/ozclef/ozclef/main/src/styles.scss", type: "scss"},
+  {name: "app.js
