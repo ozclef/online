@@ -1,0 +1,346 @@
+<!---------
+Aquí tienes tu HTML corregido y organizado. Carga archivos Markdown y HTML en su lugar, mantiene los dos headers, toggle de vistas y selectores funcionando:
+
+```html
+
+----------->
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pre View</title>
+
+  <!-- Marked.js para parsear Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card: #16181c;
+      --accent: #6ce6b6;
+      --muted: #9aa0a6;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: #eaf7f0;
+    }
+
+    /* Primer header: enlaces */
+    header.header-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+    header.header-nav h1 {
+      color: var(--accent);
+      font-size: 18px;
+    }
+    header.header-nav nav a {
+      margin-left: 16px;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* Segundo header: botones MD */
+    header.header-md {
+      position: fixed;
+      top: 52px;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      padding: 8px 24px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      z-index: 999;
+    }
+    header.header-md button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    /* Toggle entre vistas */
+    .view-toggle {
+      position: fixed;
+      top: 104px;
+      left: 24px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .view-toggle input {
+      display: none;
+    }
+    .view-toggle label {
+      background: var(--card);
+      padding: 4px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .view-toggle input:checked + label {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    /* Selectores MD/HTML */
+    .select-wrapper {
+      position: fixed;
+      top: 104px;
+      right: 24px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .select-wrapper select {
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--muted);
+      background: var(--card);
+      color: #eaf7f0;
+    }
+
+    /* Layout principal */
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr 220px;
+      gap: 18px;
+      padding: 160px 24px 24px;
+    }
+    aside {
+      background: var(--card);
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    /* Perfil */
+    #perfil-view .perfil {
+      background: var(--card);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    #perfil-view .portada {
+      height: 180px;
+      background: url('imgs/IMG_20251014_135622.jpg') center/cover;
+      position: relative;
+    }
+    #perfil-view .foto-perfil {
+      position: absolute;
+      bottom: -40px;
+      left: 24px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid var(--card);
+      background: url('https://github.com/las-hermanas/shop/raw/main/imgs/IMG_20251014_135622.jpg') center/cover;
+    }
+    #perfil-view .info {
+      padding: 60px 24px 24px;
+    }
+    #perfil-view .info h2 {
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+    #perfil-view .info p {
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    #perfil-view .datos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    #perfil-view .dato {
+      background: rgba(255,255,255,0.03);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    /* Contenedor dinámico MD/HTML */
+    #content-view-inner {
+      background: var(--card);
+      padding: 24px;
+      border-radius: 8px;
+      color: #eaf7f0;
+      overflow-y: auto;
+      max-height: 80vh;
+    }
+
+    /* Ocultar y mostrar vistas */
+    .view {
+      display: none;
+    }
+    .view.active {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      aside:first-of-type {
+        display: none;
+      }
+      #perfil-view .datos {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-nav">
+    <h1>PRE VIEW</h1>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Productos</a>
+      <a href="#">Más</a>
+    </nav>
+  </header>
+
+  <header class="header-md">
+    <button onclick="loadMarkdown('docs/CONTRATACIONES.md')">Contrataciones</button>
+    <button onclick="loadMarkdown('docs/PROFESSIONAL.md')">Profesional - Currículum</button>
+    <button onclick="loadMarkdown('docs/terminos.md')">Términos y Condiciones</button>
+  </header>
+
+  <div class="view-toggle">
+    <input type="radio" name="view" id="toggle-perfil" checked>
+    <label for="toggle-perfil" onclick="showView('perfil-view')">Perfil</label>
+
+    <input type="radio" name="view" id="toggle-content">
+    <label for="toggle-content" onclick="showView('content-view')">Contenido</label>
+  </div>
+
+  <div class="select-wrapper">
+    <label for="md-select">.md:</label>
+    <select id="md-select">
+      <option value="">– seleccionar –</option>
+      <option value="docs/CONTRATACIONES.md">Contrataciones</option>
+      <option value="docs/PROFESSIONAL.md">Profesional - Currículum</option>
+      <option value="docs/terminos.md">Términos y Condiciones</option>
+    </select>
+
+    <label for="html-select">.html:</label>
+    <select id="html-select">
+      <option value="">– seleccionar –</option>
+      <option value="feed/index.html">feed ALL</option>
+      <option value="feed/filosofia.html">Filosofía</option>
+      <option value="feed/terror.html">Terror Videos</option>
+    </select>
+  </div>
+
+  <div class="layout">
+    <aside>
+      <h3>Menú</h3>
+      <p>Temas…</p>
+    </aside>
+
+    <main id="perfil-view" class="view active">
+      <div class="perfil">
+        <div class="portada">
+          <div class="foto-perfil"></div>
+        </div>
+        <div class="info">
+          <h2>LAS HERMANAS</h2>
+          <p>Tienda online creativa.</p>
+          <div class="datos">
+            <div class="dato"><strong>Ubicación:</strong> Tlaxcala, México</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <main id="content-view" class="view">
+      <div id="content-view-inner">
+        <p>Selecciona un Markdown o HTML para vista previa.</p>
+      </div>
+    </main>
+
+    <aside>
+      <h3>Info – loc</h3>
+      <p>–</p>
+      <section>
+        <p>La manera de bajar las chips moradas con las pinzas del pan me enamora.</p>
+        <a href="https://las-hermanas.github.io/shop/">Visitar tienda</a>
+      </section>
+    </aside>
+  </div>
+
+  <script>
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.getElementById('toggle-content').checked = (id === 'content-view');
+    }
+
+    async function loadMarkdown(file) {
+      if (!file) return;
+      try {
+        const res = await fetch(file);
+        const text = await res.text();
+        document.getElementById('content-view-inner').innerHTML = marked.parse(text);
+        showView('content-view');
+      } catch {
+        document.getElementById('content-view-inner').innerHTML =
+          '<p style="color:red">Error al cargar Markdown.</p>';
+      }
+    }
+
+    async function loadHTML(file) {
+      if (!file) return;
+      try {
+        const res = await fetch(file);
+        const text = await res.text();
+        document.getElementById('content-view-inner').innerHTML = text;
+        showView('content-view');
+      } catch {
+        document.getElementById('content-view-inner').innerHTML =
+          '<p style="color:red">Error al cargar HTML.</p>';
+      }
+    }
+
+    document.getElementById('md-select')
+      .addEventListener('change', e => loadMarkdown(e.target.value));
+
+    document.getElementById('html-select')
+      .addEventListener('change', e => loadHTML(e.target.value));
+  </script>
+</body>
+</html>
+
+
+<!---
+```
+
+Con esto:
+
+- Eliminamos comentarios y líneas sobrantes  
+- Unificamos ambos headers  
+- Corregimos la clase de `<header class="header-md">` y su CSS  
+- Ordenamos selects y opciones para `.md` y `.html`  
+- Ajustamos rutas de imagen y estilos para que todo quede en su sitio  
+
+Para añadir más archivos, solo agrega nuevas `<option>` en los `<select>` correspondientes y el preview funcionará automáticamente.
