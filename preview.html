@@ -10,44 +10,17 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
-    :root {
-      --bg: #0f1115;
-      --card: #16181c;
-      --accent: #6ce6b6;
-      --muted: #9aa0a6;
-    }
+    :root {      --bg: #0f1115;      --card: #16181c;      --accent: #6ce6b6;      --muted: #9aa0a6;    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: #eaf7f0;
-    }
-
+    body {      font-family: 'Segoe UI', sans-serif;      background: var(--bg);      color: #eaf7f0;    }
     /* Primer header: enlaces */
-    header.header-nav {
-      position: fixed; top: 0; left: 0; right: 0;
-      background: var(--card); padding: 12px 24px;
-      display: flex; justify-content: space-between; align-items: center;
-      z-index: 1000;
-    }
+    header.header-nav {      position: fixed; top: 0; left: 0; right: 0;      background: var(--card); padding: 12px 24px;      display: flex; justify-content: space-between; align-items: center;      z-index: 1000;    }
     header.header-nav h1 { color: var(--accent); font-size: 18px; }
-    header.header-nav nav a {
-      margin-left: 16px; color: var(--muted);
-      text-decoration: none; font-weight: 500;
-    }
+    header.header-nav nav a {      margin-left: 16px; color: var(--muted);      text-decoration: none; font-weight: 500;    }
 
     /* Segundo header: botones MD */
-    div.header-md {
-      position: fixed; top: 52px; left: 0; right: 0;
-      background: var(--card); padding: 8px 24px;
-      display: flex; justify-content: center; gap: 12px;
-      z-index: 999;
-    }
-    header.header-md button {
-      background: var(--accent); color: var(--bg);
-      border: none; padding: 6px 12px;
-      cursor: pointer; border-radius: 4px;
-    }
+    div.header-md {      position: fixed; top: 52px; left: 0; right: 0;      background: var(--card); padding: 8px 24px;      display: flex; justify-content: center; gap: 12px;      z-index: 999;    }
+    header.header-md button {      background: var(--accent); color: var(--bg);     border: none; padding: 6px 12px;      cursor: pointer; border-radius: 4px;    }
 
     /* Toggle entre vistas */
     .view-toggle {
@@ -55,44 +28,21 @@
       display: flex; gap: 6px; align-items: center;
     }
     .view-toggle input { display: none; }
-    .view-toggle label {
-      background: var(--card); padding: 4px 8px;
-      cursor: pointer; border-radius: 4px;
-    }
-    .view-toggle input:checked + label {
-      background: var(--accent); color: var(--bg);
-    }
+    .view-toggle label {      background: var(--card); padding: 4px 8px;      cursor: pointer; border-radius: 4px;    }
+    .view-toggle input:checked + label {      background: var(--accent); color: var(--bg);    }
 
     /* Selectores MD/HTML */
-    .select-wrapper {
-      position: fixed; top: 104px; right: 24px;
-      display: flex; gap: 8px; align-items: center;
-    }
-    .select-wrapper select {
-      padding: 4px 8px; border-radius: 4px;
-      border: 1px solid var(--muted);
-      background: var(--card); color: #eaf7f0;
-    }
+    .select-wrapper {      position: fixed; top: 104px; right: 24px;      display: flex; gap: 8px; align-items: center;    }
+    .select-wrapper select {      padding: 4px 8px; border-radius: 4px;      border: 1px solid var(--muted);      background: var(--card); color: #eaf7f0;    }
 
     /* Layout principal */
-    .layout {
-      display: grid;
-      grid-template-columns: 220px 1fr 220px;
-      gap: 18px;
-      padding: 160px 24px 24px;
-    }
+    .layout {      display: grid;      grid-template-columns: 220px 1fr 220px;      gap: 18px;      padding: 160px 24px 24px;    }
 
-    aside {
-      background: var(--card); padding: 12px; border-radius: 8px;
-    }
+    aside {      background: var(--card); padding: 12px; border-radius: 8px;    }
 
     /* Perfil */
-    #perfil-view .perfil {
-      background: var(--card); border-radius: 12px; overflow: hidden;
-    }
-    #perfil-view .portada {
-      height: 180px; background: url('imgs/IMG_20251014_135622.jpg') center/cover; position: relative;
-    }
+    #perfil-view .perfil {      background: var(--card); border-radius: 12px; overflow: hidden;    }
+    #perfil-view .portada {      height: 180px; background: url('imgs/IMG_20251014_135622.jpg') center/cover; position: relative;    }
     #perfil-view .foto-perfil {
       position: absolute; bottom: -40px; left: 24px;
       width: 80px; height: 80px; border-radius: 50%;
@@ -141,7 +91,8 @@
     </nav>
   </header>
 
-  <!-- Header con botones para MD ------ >
+  <!-- Header con botones para MD ------>
+  
   <div class="header-md">
     <button onclick="loadMarkdown('docs/CONTRATACIONES.md')">Contrataciones</button>
     <button onclick="loadMarkdown('docs/CURRICULUM.md')">Currículum</button>
