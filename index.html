@@ -155,7 +155,29 @@
   </div>
     </aside>
 
-  <main>
+<div class="select-wrapper">
+    <label for="md-select">.md:</label>
+    <select id="md-select">
+      <option value="">– seleccionar –</option>
+      <option value="docs/CONTRATACIONES.md">Contrataciones</option>
+      <option value="docs/PROFESSIONAL.md">Profesional - Currículum</option>
+      <option value="docs/terminos.md">Términos y Condiciones</option>
+    </select>
+    <label for="html-select">.html:</label>
+    <select id="html-select">
+      <option value="">– seleccionar –</option>
+      <option value="feed/index.html">feed ALL</option>
+      <option value="feed/filosofia.html">Filosofía</option>
+      <option value="feed/terror.html">Terror Videos</option>
+      <option value="feed/happy/index.html"> RIE ! </option>
+    </select>
+  </div>
+
+<main id="perfil-view" class="view active">
+
+
+	<main id="perfil-view" class="view 
+  
     <div class="perfil">
       <div class="portada">
         <div class="foto-perfil"></div>
@@ -260,4 +282,48 @@ sepan que siempre cada segundo pienso y los adoro aun con cariño
     document.body.style.display = 'flex';
     document.body.style.justifyContent = 'center';
   }
-</script></body></html>
+
+
+	
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.getElementById('toggle-content').checked = (id === 'content-view');
+    }
+
+    async function loadMarkdown(file) {
+      if (!file) return;
+      try {
+        const res = await fetch(file);
+        const text = await res.text();
+        document.getElementById('content-view-inner').innerHTML = marked.parse(text);
+        showView('content-view');
+      } catch {
+        document.getElementById('content-view-inner').innerHTML =
+          '<p style="color:red">Error al cargar Markdown.</p>';
+      }
+    }
+
+    async function loadHTML(file) {
+      if (!file) return;
+      try {
+        const res = await fetch(file);
+        const text = await res.text();
+        document.getElementById('content-view-inner').innerHTML = text;
+        showView('content-view');
+      } catch {
+        document.getElementById('content-view-inner').innerHTML =
+          '<p style="color:red">Error al cargar HTML.</p>';
+      }
+    }
+
+    document.getElementById('md-select')
+      .addEventListener('change', e => loadMarkdown(e.target.value));
+
+    document.getElementById('html-select')
+      .addEventListener('change', e => loadHTML(e.target.value));
+  </script>
+
+		
+</body>
+</html>
