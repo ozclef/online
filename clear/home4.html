@@ -1,0 +1,323 @@
+
+<!-------
+
+Para que tus iframes de YouTube (u otros contenidos) se escalen y que todo tu UI quepa bien en pantallas pequeñas, lo mejor es hacer tu diseño 100% _responsive_ y usar contenedores con `max-width` en lugar de valores fijos altos. Te dejo un ejemplo de cómo podrías estructurar tu **index.html**, tu **styles.css** y tu **scripts.js** para:
+
+- Tener un solo `<main>` estático con el perfil  
+- Una sección única (`<section id="content-area">`) que dentro tendrá sub‐secciones para:  
+  1. Videos  
+  2. Media (fotos/videos)  
+  3. Publicaciones (texto)  
+- Usar botones o tabs para alternar entre esas tres sub‐secciones  
+- Que cada iframe nunca supere `360px` y ocupe el 100% de su contenedor  
+
+---
+
+## Estructura de carpetas recomendada
+
+```
+/
+├── index.html
+├── styles/
+│   └── styles.css
+├── scripts/
+│   └── scripts.js
+└── feed/
+    ├── videos/
+    │   └── index.html
+    ├── media/
+    │   └── index.html
+    └── publicaciones/
+        └── index.html
+```
+
+---
+
+## index.html
+
+```html
+------->
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Las Hermanas — Inicio</title>
+  <link rel="stylesheet" href="styles/styles.css">
+  <style>
+    /*
+## styles/styles.css
+
+```css
+    */
+:root {
+  --bg: #0f1115;
+  --card: #16181c;
+  --accent: #6ce6b6;
+  --muted: #9aa0a6;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: #eaf7f0;
+}
+
+/* headers fijos */
+.header-nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  background: var(--card); padding: 12px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 1000;
+}
+.header-nav h1 { color: var(--accent); font-size: 18px; }
+.header-nav nav a {
+  margin-left: 16px; color: var(--muted);
+  text-decoration: none; font-weight: 500;
+}
+
+.header-md {
+  position: fixed; top: 52px; left: 0; right: 0;
+  background: var(--card); padding: 8px 24px;
+  display: flex; justify-content: center; gap: 12px;
+  z-index: 999;
+}
+.header-md button {
+  background: var(--accent); color: var(--bg);
+  border: none; padding: 6px 12px;
+  cursor: pointer; border-radius: 4px;
+}
+
+/* grid layout */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  gap: 18px;
+  padding: 160px 24px 24px;
+}
+aside {
+  background: var(--card); padding: 12px; border-radius: 8px;
+}
+
+/* perfil */
+.perfil {
+  background: var(--card); border-radius: 12px;
+  text-align: center; padding: 24px;
+  margin-bottom: 16px;
+}
+.portada {
+  height: 120px;
+  background: url('imgs/IMG_20251014_135622.jpg') center/cover;
+}
+.foto-perfil {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 4px solid var(--card);
+  background: url('imgs/IMG_20251014_135622.jpg') center/cover;
+  margin: -40px auto 8px;
+}
+.info h2 { margin-bottom: 4px; }
+.info p { color: var(--muted); }
+
+/* tabs internos */
+.content-nav {
+  display: flex; gap: 8px;
+  margin-bottom: 16px;
+}
+.content-nav button {
+  background: var(--card); color: var(--muted);
+  border: 1px solid var(--muted);
+  padding: 6px 12px; cursor: pointer; border-radius: 4px;
+}
+.content-nav button.active {
+  background: var(--accent); color: var(--bg);
+  border-color: var(--accent);
+}
+
+/* área dinámica */
+#content-area {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+/* sub-secciones */
+.feed-section {
+  display: none;
+}
+.feed-section.active {
+  display: block;
+}
+
+/* grid de videos */
+.vid-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.vid .responsive-iframe {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 16/9;
+  border: none;
+}
+.vid p {
+  margin-top: 4px; font-size: 14px; text-align: center;
+}
+
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  aside:first-of-type { display: none; }
+}
+  </style>
+</head>
+<body>
+
+  <!-- header fijo con logo y nav -->
+  <header class="header-nav">
+    <h1>Las Hermanas</h1>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Productos</a>
+      <a href="#">Más</a>
+    </nav>
+  </header>
+
+  <!-- header fijo con botones MD (opcional) -->
+  <header class="header-md">
+    <button data-md="docs/CONTRATACIONES.md">Contrataciones</button>
+    <button data-md="docs/PROFESSIONAL.md">Currículum</button>
+    <button data-md="docs/terminos.md">Términos</button>
+  </header>
+
+  <!-- Layout principal -->
+  <div class="layout">
+    <aside>
+      <h3>Menú</h3>
+      <p>Temas…</p>
+    </aside>
+
+    <main>
+      <!-- PERFIL estático arriba -->
+      <div class="perfil">
+        <div class="portada"></div>
+        <div class="foto-perfil"></div>
+        <div class="info">
+          <h2>LAS HERMANAS</h2>
+          <p>Tienda online creativa</p>
+        </div>
+      </div>
+
+      <!-- BOTONES/TABS para elegir feeds -->
+      <div class="content-nav">
+        <button data-feed="feed-videos">Videos</button>
+        <button data-feed="feed-media">Media</button>
+        <button data-feed="feed-posts">Publicaciones</button>
+      </div>
+
+      <!-- SECCIÓN ÚNICA que contendrá las 3 sub-secciones -->
+      <section id="content-area">
+        <div id="feed-videos" class="feed-section active">
+          <!-- Aquí o bien incluyes un iframe o traes con fetch feed/videos/index.html -->
+          <!-- Ejemplo de grid de videos -->
+          <div class="vid-grid">
+            <div class="vid">
+              <iframe class="responsive-iframe"
+                      src="https://www.youtube.com/embed/ABC123"
+                      frameborder="0" allowfullscreen>
+              </iframe>
+              <p>Título del video</p>
+            </div>
+            <!-- más .vid -->
+          </div>
+        </div>
+        <div id="feed-media" class="feed-section">
+          <!-- grid de fotos/videos -->
+        </div>
+        <div id="feed-posts" class="feed-section">
+          <!-- lista de textos/publicaciones -->
+        </div>
+      </section>
+    </main>
+
+    <aside>
+      <h3>Info – loc</h3>
+      <p>…</p>
+    </aside>
+  </div>
+
+  <script src="scripts/scripts.js"></script>
+<script>
+  /*
+## scripts/scripts.js
+
+```js
+
+  */
+// Función para alternar pestañas internas
+document.querySelectorAll('.content-nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // botones
+    document.querySelectorAll('.content-nav button')
+      .forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // secciones
+    document.querySelectorAll('.feed-section')
+      .forEach(s => s.classList.remove('active'));
+    document.getElementById(btn.dataset.feed)
+      .classList.add('active');
+  });
+});
+
+// Carga Markdown en caso de usar header-md
+async function loadMarkdown(path) {
+  const area = document.getElementById('content-area');
+  try {
+    const md = await fetch(path).then(r => r.text());
+    area.innerHTML = marked.parse(md);
+  } catch {
+    area.innerHTML = '<p style="color:red">Error cargando MD.</p>';
+  }
+}
+document.querySelectorAll('.header-md button').forEach(b => {
+  b.addEventListener('click', () => loadMarkdown(b.dataset.md));
+});
+```
+</script>
+  
+</body>
+</html>
+
+<!--------
+```
+
+---
+
+```
+
+---
+
+
+---
+
+Con esto:
+
+- Cada iframe se ajusta al ancho del contenedor sin pasarse de `360px`  
+- Tu `<main>` y tu `<section id="content-area">` quedan fijos, solo cambian las **sub-secciones**  
+- Tienes tres pestañas internas para videos, media y publicaciones  
+- Es totalmente responsive y cabe bien en zoom o en pantallas estrechas  
+
+Solo asegúrate de rellenar los directorios:
+
+- `feed/videos/index.html` (donde puedes listar iframes)  
+- `feed/media/index.html` (galería de fotos/videos)  
+- `feed/publicaciones/index.html` (posts de solo texto)  
+
+¡Así tu sitio “Las Hermanas” se ve limpio, ordenado y 100% responsive!
