@@ -1,3 +1,6 @@
+
+<!-------
+
 Para que tus iframes de YouTube (u otros contenidos) se escalen y que todo tu UI quepa bien en pantallas pequeñas, lo mejor es hacer tu diseño 100% _responsive_ y usar contenedores con `max-width` en lugar de valores fijos altos. Te dejo un ejemplo de cómo podrías estructurar tu **index.html**, tu **styles.css** y tu **scripts.js** para:
 
 - Tener un solo `<main>` estático con el perfil  
@@ -33,6 +36,9 @@ Para que tus iframes de YouTube (u otros contenidos) se escalen y que todo tu UI
 ## index.html
 
 ```html
+------->
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -119,6 +125,8 @@ Para que tus iframes de YouTube (u otros contenidos) se escalen y que todo tu UI
   <script src="scripts/scripts.js"></script>
 </body>
 </html>
+
+<!--------
 ```
 
 ---
