@@ -1,0 +1,497 @@
+<!--
+Archivo: index.html  (preview + UI)
+También incluí abajo otros archivos necesarios como: assets/css/style.css, generator.js y .github/workflows/gen-manifest.yml
+Copia cada bloque en su respectiva ruta en tu repo.
+-->
+
+<!-- ===================== index.html ===================== -->
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Feed - Vista previa vertical</title>
+  <!------
+  <link rel="stylesheet" href="/assets/css/style.css">
+  --------->
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Guarda como: /assets/css/style.css */
+:root{
+  --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#7dd3fc;
+  --radius:14px; --pad:12px;
+}
+*{box-sizing:border-box}
+body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue'; margin:0; background:linear-gradient(180deg,#061025,#071226); color:#e6eef6}
+.site-header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.menu-btn{font-size:18px;padding:6px 8px}
+.header-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.left-nav{position:fixed; left:0; top:64px; width:220px; bottom:0; padding:12px; background:rgba(6,12,20,0.6); backdrop-filter:blur(6px); border-right:1px solid rgba(255,255,255,0.03); overflow:auto}
+.left-nav.closed{transform:translateX(-112%); transition:transform .25s}
+.left-nav ul{list-style:none;padding:0;margin:0}
+.left-nav li{margin:6px 0}
+.left-nav a{color:var(--muted); text-decoration:none}
+.main-feed{margin-left:240px;padding:16px}
+.cat-section{margin-bottom:28px}
+.cat-header h2{margin:0 0 12px 0;font-size:18px}
+.cat-row{display:flex;gap:16px;overflow:auto;padding-bottom:8px}
+.card{width:260px;flex:0 0 auto;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;padding:8px;box-shadow:0 6px 18px rgba(2,6,12,0.6);transition:transform .18s,box-shadow .18s}
+.card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 14px 32px rgba(0,0,0,0.6)}
+.card iframe{width:100%;height:420px;border-radius:8px;border:0;background:#000}
+.card-info{padding:8px}
+.card-info h3{margin:0;font-size:15px}
+.card-info p{margin:6px 0 10px 0;color:var(--muted);font-size:13px}
+.card-actions{display:flex;gap:8px}
+.card-actions button, .card-actions a{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 8px;border-radius:8px;color:var(--accent);text-decoration:none}
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,8,15,0.6)}
+.modal.hidden{display:none}
+.modal-inner{width:90%;height:90%;background:#071226;border-radius:12px;padding:12px;position:relative}
+.modal-inner iframe{width:100%;height:100%;border-radius:8px;border:0}
+.modal-inner button{position:absolute;right:12px;top:12px}
+.empty{color:var(--muted);padding:40px;text-align:center}
+.mini-panel.hidden{display:none}
+
+/* responsive */
+@media(max-width:900px){.main-feed{margin-left:0;padding:10px}.left-nav{position:relative;width:100%;transform:none;top:0;height:auto}}
+
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <button id="menuToggle" class="menu-btn">☰</button>
+    <h1>Mis publicaciones — Feed</h1>
+    <div class="header-actions">
+      <button id="showHtmlBtn">HTML</button>
+      <button id="showMdBtn">MD</button>
+      <input id="search" placeholder="Buscar título o categoría" />
+    </div>
+  </header>
+
+  <aside id="leftNav" class="left-nav closed">
+    <ul>
+      <li><a href="#" data-action="all">Todas</a></li>
+      <li><a href="#" data-action="comedia">Comedia</a></li>
+      <li><a href="#" data-action="video">Video</a></li>
+      <li><a href="#" data-action="otros">Otros</a></li>
+    </ul>
+    <div class="small-menus">
+      <button class="mini-btn" id="miniMenu1">Botones v1</button>
+      <div id="miniMenu1Panel" class="mini-panel hidden">
+        <button data-action="toggleGrid">Alternar grid</button>
+        <button data-action="compact">Compacto</button>
+      </div>
+    </div>
+  </aside>
+
+  <main id="mainFeed" class="main-feed">
+    <!-- Secciones por categoría serán insertadas aquí -->
+  </main>
+
+  <!-- Modal para ver el HTML a tamaño completo -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-inner">
+      <button id="closeModal">Cerrar ✕</button>
+      <iframe id="modalFrame" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+    </div>
+  </div>
+
+  <script>
+  // Config
+  const MANIFEST_PATHS = ['/feed/manifest.json', '/manifest.json']; // intenta varias rutas
+  const CARD_IFRAME_HEIGHT = 420; // px
+
+  // util: fetch manifest intentando varias rutas
+  async function loadManifest() {
+    for (const p of MANIFEST_PATHS) {
+      try {
+        const r = await fetch(p);
+        if (!r.ok) continue;
+        const json = await r.json();
+        return json;
+      } catch (e) {
+        // sigue a la siguiente ruta
+      }
+    }
+    return null;
+  }
+
+  function groupBy(arr, key) {
+    return arr.reduce((acc, item) => {
+      const k = item[key] || 'sin-categoria';
+      (acc[k] = acc[k] || []).push(item);
+      return acc;
+    }, {});
+  }
+
+  function createCard(item) {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.dataset.type = item.type || 'html';
+    card.dataset.category = item.category || '';
+
+    const iframe = document.createElement('iframe');
+    iframe.src = item.path;
+    iframe.width = '260';
+    iframe.height = CARD_IFRAME_HEIGHT.toString();
+    iframe.loading = 'lazy';
+    iframe.sandbox = 'allow-same-origin allow-scripts allow-forms';
+
+    const info = document.createElement('div');
+    info.className = 'card-info';
+    const h3 = document.createElement('h3');
+    h3.textContent = item.title || (item.path.split('/').pop());
+    const p = document.createElement('p');
+    p.textContent = item.description || '';
+
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+    const open = document.createElement('button');
+    open.textContent = 'Abrir grande';
+    open.onclick = () => openModal(item.path);
+    const newtab = document.createElement('a');
+    newtab.href = item.path;
+    newtab.target = '_blank';
+    newtab.textContent = 'Ir a página';
+
+    actions.appendChild(open);
+    actions.appendChild(newtab);
+
+    info.appendChild(h3);
+    info.appendChild(p);
+    info.appendChild(actions);
+
+    card.appendChild(iframe);
+    card.appendChild(info);
+    return card;
+  }
+
+  function renderFeed(manifest) {
+    const main = document.getElementById('mainFeed');
+    main.innerHTML = '';
+    const byCat = groupBy(manifest, 'category');
+    for (const [cat, items] of Object.entries(byCat)) {
+      const section = document.createElement('section');
+      section.className = 'cat-section';
+      const header = document.createElement('header');
+      header.className = 'cat-header';
+      header.innerHTML = `<h2>${cat} <small>${items.length}</small></h2>`;
+
+      const row = document.createElement('div');
+      row.className = 'cat-row';
+
+      items.forEach(it => row.appendChild(createCard(it)));
+
+      section.appendChild(header);
+      section.appendChild(row);
+      main.appendChild(section);
+    }
+  }
+
+  function openModal(path) {
+    const modal = document.getElementById('modal');
+    const frame = document.getElementById('modalFrame');
+    frame.src = path;
+    modal.classList.remove('hidden');
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('modal');
+    const frame = document.getElementById('modalFrame');
+    frame.src = 'about:blank';
+    modal.classList.add('hidden');
+  }
+
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('.left-nav a')) e.preventDefault();
+  });
+
+  // UI - filtros sencillos
+  function setupUI(manifest) {
+    document.getElementById('closeModal').onclick = closeModal;
+    document.getElementById('menuToggle').onclick = () => document.getElementById('leftNav').classList.toggle('closed');
+
+    document.querySelectorAll('#leftNav a').forEach(a => {
+      a.addEventListener('click', (ev) => {
+        const action = a.dataset.action;
+        filterByCategory(action, manifest);
+      });
+    });
+
+    document.getElementById('miniMenu1').onclick = () => document.getElementById('miniMenu1Panel').classList.toggle('hidden');
+
+    document.getElementById('showHtmlBtn').onclick = () => filterByType('html', manifest);
+    document.getElementById('showMdBtn').onclick = () => filterByType('md', manifest);
+
+    document.getElementById('search').addEventListener('input', (e)=>{
+      const q = e.target.value.trim().toLowerCase();
+      const filtered = manifest.filter(x => (x.title||'').toLowerCase().includes(q) || (x.category||'').toLowerCase().includes(q));
+      renderFeed(filtered);
+    });
+  }
+
+  function filterByCategory(cat, manifest) {
+    if (cat === 'all') return renderFeed(manifest);
+    const filtered = manifest.filter(x => (x.category || '').toLowerCase() === cat);
+    renderFeed(filtered);
+  }
+
+  function filterByType(type, manifest) {
+    const filtered = manifest.filter(x => (x.type || 'html') === type);
+    renderFeed(filtered);
+  }
+
+  // carga inicial
+  (async function(){
+    const manifest = await loadManifest();
+    if (!manifest) {
+      document.getElementById('mainFeed').innerHTML = '<p class="empty">No se encontró manifest (feed/manifest.json). Usa el generador incluido.</p>';
+      return;
+    }
+    setupUI(manifest);
+    renderFeed(manifest);
+  })();
+
+
+
+
+
+/* =========================================================================*/
+      // Guarda como: scripts/gen-manifest.js
+// Ejecutar: node scripts/gen-manifest.js
+// Crea feed/manifest.json con title, path, category, description, type
+
+const fs = require('fs').promises;
+const path = require('path');
+
+const ROOT = process.cwd();
+const SCAN_DIRS = ['feed', 'md', 'scripts'];
+const OUT_FILE = path.join(ROOT, 'feed', 'manifest.json');
+
+async function walk(dir){
+  let results = [];
+  const list = await fs.readdir(dir, {withFileTypes:true});
+  for(const ent of list){
+    const res = path.join(dir, ent.name);
+    if(ent.isDirectory()) results = results.concat(await walk(res));
+    else results.push(res);
+  }
+  return results;
+}
+
+async function extractMeta(filePath){
+  const ext = path.extname(filePath).toLowerCase();
+  const rel = path.relative(ROOT, filePath).replace(/\\/g, '/');
+  let title = path.basename(filePath);
+  let desc = '';
+  let category = 'sin-categoria';
+  try{
+    const txt = await fs.readFile(filePath,'utf8');
+    if(ext === '.html'){
+      // busca comentario tipo <!-- title: Mi título -->
+      const m = txt.match(/<!--\s*title:\s*([^\n\-<>]+)\s*-->/i);
+      if(m) title = m[1].trim();
+      else {
+        const t = txt.match(/<title>([^<]+)<\/title>/i);
+        if(t) title = t[1].trim();
+      }
+    } else if(ext === '.md'){
+      const m = txt.match(/^#\s+(.+)$/m);
+      if(m) title = m[1].trim();
+    }
+    // busca comentario category: ...
+    const mc = txt.match(/<!--\s*category:\s*([^\n]+)\s*-->/i);
+    if(mc) category = mc[1].trim();
+    const md = txt.match(/<!--\s*desc:\s*([^\n]+)\s*-->/i);
+    if(md) desc = md[1].trim();
+  }catch(e){}
+  return {path:'/' + rel, title, description:desc, category, type: ext.replace('.','') };
+}
+
+(async()=>{
+  const entries = [];
+  for(const d of SCAN_DIRS){
+    const full = path.join(ROOT, d);
+    try{
+      const files = await walk(full);
+      for(const f of files){
+        const ext = path.extname(f).toLowerCase();
+        if(['.html','.md','.htm','.js'].includes(ext)){
+          const meta = await extractMeta(f);
+          entries.push(meta);
+        }
+      }
+    }catch(e){/* directorio no existe */}
+  }
+  // crear carpeta feed si no existe
+  await fs.mkdir(path.dirname(OUT_FILE), {recursive:true});
+  await fs.writeFile(OUT_FILE, JSON.stringify(entries, null, 2), 'utf8');
+  console.log('Manifest generado en', OUT_FILE);
+})();
+
+  </script>
+</body>
+</html>
+
+<!-----
+<!-- ===================== assets/css/style.css ===================== -->
+<!-----
+/* Guarda como: /assets/css/style.css */
+:root{
+  --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#7dd3fc;
+  --radius:14px; --pad:12px;
+}
+*{box-sizing:border-box}
+body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue'; margin:0; background:linear-gradient(180deg,#061025,#071226); color:#e6eef6}
+.site-header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.menu-btn{font-size:18px;padding:6px 8px}
+.header-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.left-nav{position:fixed; left:0; top:64px; width:220px; bottom:0; padding:12px; background:rgba(6,12,20,0.6); backdrop-filter:blur(6px); border-right:1px solid rgba(255,255,255,0.03); overflow:auto}
+.left-nav.closed{transform:translateX(-112%); transition:transform .25s}
+.left-nav ul{list-style:none;padding:0;margin:0}
+.left-nav li{margin:6px 0}
+.left-nav a{color:var(--muted); text-decoration:none}
+.main-feed{margin-left:240px;padding:16px}
+.cat-section{margin-bottom:28px}
+.cat-header h2{margin:0 0 12px 0;font-size:18px}
+.cat-row{display:flex;gap:16px;overflow:auto;padding-bottom:8px}
+.card{width:260px;flex:0 0 auto;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;padding:8px;box-shadow:0 6px 18px rgba(2,6,12,0.6);transition:transform .18s,box-shadow .18s}
+.card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 14px 32px rgba(0,0,0,0.6)}
+.card iframe{width:100%;height:420px;border-radius:8px;border:0;background:#000}
+.card-info{padding:8px}
+.card-info h3{margin:0;font-size:15px}
+.card-info p{margin:6px 0 10px 0;color:var(--muted);font-size:13px}
+.card-actions{display:flex;gap:8px}
+.card-actions button, .card-actions a{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 8px;border-radius:8px;color:var(--accent);text-decoration:none}
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,8,15,0.6)}
+.modal.hidden{display:none}
+.modal-inner{width:90%;height:90%;background:#071226;border-radius:12px;padding:12px;position:relative}
+.modal-inner iframe{width:100%;height:100%;border-radius:8px;border:0}
+.modal-inner button{position:absolute;right:12px;top:12px}
+.empty{color:var(--muted);padding:40px;text-align:center}
+.mini-panel.hidden{display:none}
+
+/* responsive */
+@media(max-width:900px){.main-feed{margin-left:0;padding:10px}.left-nav{position:relative;width:100%;transform:none;top:0;height:auto}}
+
+
+<!-- ===================== generator.js (Node) ===================== -->
+
+<!--------
+// Guarda como: scripts/gen-manifest.js
+// Ejecutar: node scripts/gen-manifest.js
+// Crea feed/manifest.json con title, path, category, description, type
+
+const fs = require('fs').promises;
+const path = require('path');
+
+const ROOT = process.cwd();
+const SCAN_DIRS = ['feed', 'md', 'scripts'];
+const OUT_FILE = path.join(ROOT, 'feed', 'manifest.json');
+
+async function walk(dir){
+  let results = [];
+  const list = await fs.readdir(dir, {withFileTypes:true});
+  for(const ent of list){
+    const res = path.join(dir, ent.name);
+    if(ent.isDirectory()) results = results.concat(await walk(res));
+    else results.push(res);
+  }
+  return results;
+}
+
+async function extractMeta(filePath){
+  const ext = path.extname(filePath).toLowerCase();
+  const rel = path.relative(ROOT, filePath).replace(/\\/g, '/');
+  let title = path.basename(filePath);
+  let desc = '';
+  let category = 'sin-categoria';
+  try{
+    const txt = await fs.readFile(filePath,'utf8');
+    if(ext === '.html'){
+      // busca comentario tipo <!-- title: Mi título -->
+      const m = txt.match(/<!--\s*title:\s*([^\n\-<>]+)\s*-->/i);
+      if(m) title = m[1].trim();
+      else {
+        const t = txt.match(/<title>([^<]+)<\/title>/i);
+        if(t) title = t[1].trim();
+      }
+    } else if(ext === '.md'){
+      const m = txt.match(/^#\s+(.+)$/m);
+      if(m) title = m[1].trim();
+    }
+    // busca comentario category: ...
+    const mc = txt.match(/<!--\s*category:\s*([^\n]+)\s*-->/i);
+    if(mc) category = mc[1].trim();
+    const md = txt.match(/<!--\s*desc:\s*([^\n]+)\s*-->/i);
+    if(md) desc = md[1].trim();
+  }catch(e){}
+  return {path:'/' + rel, title, description:desc, category, type: ext.replace('.','') };
+}
+
+(async()=>{
+  const entries = [];
+  for(const d of SCAN_DIRS){
+    const full = path.join(ROOT, d);
+    try{
+      const files = await walk(full);
+      for(const f of files){
+        const ext = path.extname(f).toLowerCase();
+        if(['.html','.md','.htm','.js'].includes(ext)){
+          const meta = await extractMeta(f);
+          entries.push(meta);
+        }
+      }
+    }catch(e){/* directorio no existe */}
+  }
+  // crear carpeta feed si no existe
+  await fs.mkdir(path.dirname(OUT_FILE), {recursive:true});
+  await fs.writeFile(OUT_FILE, JSON.stringify(entries, null, 2), 'utf8');
+  console.log('Manifest generado en', OUT_FILE);
+})();
+
+
+<!-- ===================== .github/workflows/gen-manifest.yml ===================== -->
+<!-----
+          
+          # Guarda como: .github/workflows/gen-manifest.yml
+# Ejecuta el generador en cada push y commitea feed/manifest.json
+name: Generar manifest
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: true
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+    - name: Run manifest generator
+      run: |
+        node scripts/gen-manifest.js
+    - name: Commit manifest
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add feed/manifest.json || true
+        git commit -m "chore: actualizar manifest" || true
+        git push || true
+
+
+<!-- ===================== sample manifest.json ===================== -->
+
+          
+          <!-----
+          
+          [
+  {
+    "title": "video cómico",
+    "path": "/feed/comedia/video1.html",
+    "category": "comedia",
+    "description": "Pequeños comentarios míos",
+    "type": "html"
+  }
+]
