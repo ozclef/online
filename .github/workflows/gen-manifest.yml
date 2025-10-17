@@ -1,0 +1,29 @@
+         
+          # Guarda como: .github/workflows/gen-manifest.yml
+# Ejecuta el generador en cada push y commitea feed/manifest.json
+name: Generar manifest
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: true
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+    - name: Run manifest generator
+      run: |
+        node scripts/gen-manifest.js
+    - name: Commit manifest
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add feed/manifest.json || true
+        git commit -m "chore: actualizar manifest" || true
+        git push || true
+
+
+<!-- ===================== sample manifest.json ===================== -->
