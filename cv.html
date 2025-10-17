@@ -1,0 +1,344 @@
+
+
+<!-- Este archivo se centra exclusivamente en la documentación profesional (CV, Contratos, Términos) -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>OO - Perfil Profesional</title>
+
+<style>
+  :root {
+  --bg: #0f1115;
+  --card: #16181c;
+  --accent: #6ce6b6;
+  --muted: #9aa0a6;
+  --text-light: #eaf7f0;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text-light);
+}
+
+/* Header enlaces */
+.header-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: var(--card);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+.header-nav h1 {
+  color: var(--accent);
+  font-size: 18px;
+}
+.header-nav nav a {
+  margin-left: 16px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Header botones (Markdown) */
+.header-md {
+  position: fixed;
+  top: 52px; left: 0; right: 0;
+  background: var(--card);
+  padding: 8px 24px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  z-index: 999;
+}
+.header-md button {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+.header-md button:hover {
+    background: #4cc799; 
+}
+
+/* Selector Markdown */
+.select-wrapper {
+  position: fixed;
+  top: 104px;
+  right: 24px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 998;
+}
+.select-wrapper label {
+    font-size: 14px;
+    color: var(--muted);
+}
+.select-wrapper select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--muted);
+  background: var(--card);
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  gap: 18px;
+  padding: 160px 24px 24px;
+}
+aside {
+  background: var(--card);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+/* Perfil */
+.perfil {
+  background: var(--card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.portada {
+  height: 180px;
+  background: url('https://placehold.co/180x180/16181c/6ce6b6?text=PORTADA+PROFESIONAL') center/cover;
+  position: relative;
+}
+.foto-perfil {
+  position: absolute;
+  bottom: -40px; left: 24px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 4px solid var(--card);
+  background: url('https://placehold.co/80x80/6ce6b6/0f1115?text=OO') center/cover;
+}
+.info {
+  padding: 60px 24px 24px;
+}
+.info h2 {
+  font-size: 22px;
+  margin-bottom: 4px;
+  color: var(--accent);
+}
+.info p {
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.dato {
+  background: rgba(255,255,255,0.03);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.dato strong {
+    color: var(--text-light);
+}
+
+/* Sección Dinámica y Estilos de Previsualización */
+#content-area {
+  background: var(--card);
+  padding: 24px;
+  border-radius: 8px;
+  margin-top: 24px;
+  color: var(--text-light);
+  max-height: 60vh;
+  overflow-y: auto;
+  border: 1px solid rgba(108, 230, 182, 0.2);
+}
+
+/* Estilos para el contenido Markdown */
+#content-area h1, #content-area h2, #content-area h3 {
+    color: var(--accent);
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid rgba(154, 160, 166, 0.2);
+    padding-bottom: 0.2em;
+}
+#content-area p {
+    margin-bottom: 1em;
+    line-height: 1.6;
+    color: var(--text-light);
+}
+#content-area strong {
+    color: var(--accent);
+}
+
+/* Media Queries (Responsive) */
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 160px 12px 12px;
+  }
+  aside:first-of-type {
+    display: none;
+  }
+  .datos {
+    grid-template-columns: 1fr;
+  }
+  .select-wrapper {
+      top: 130px; 
+      right: 12px;
+      left: 12px;
+      justify-content: flex-end;
+  }
+  .header-md {
+      padding: 8px 12px;
+  }
+}
+</style>
+  
+</head>
+<body>
+
+  <header class="header-nav">
+    <h1>PERFIL PROFESIONAL</h1>
+    <nav>
+      <a href="#" class="text-white">Inicio</a>
+      <a href="#">Proyectos</a>
+      <a href="#">Contacto</a>
+    </nav>
+  </header>
+
+  <header class="header-md">
+    <button data-path="docs/CONTRATACIONES.md">Contrataciones</button>
+    <button data-path="docs/PROFESSIONAL.md">Currículum</button>
+    <button data-path="docs/terminos.md">Términos</button>
+  </header>
+
+  <div class="select-wrapper">
+    <label for="md-select">Docs (.md):</label>
+    <select id="md-select">
+      <option value="">– seleccionar –</option>
+      <option value="docs/CONTRATACIONES.md">Contrataciones</option>
+      <option value="docs/PROFESSIONAL.md">Currículum</option>
+      <option value="docs/terminos.md">Términos y Condiciones</option>
+    </select>
+  </div>
+
+  <div class="layout">
+    <aside>
+      <h3>Menú Rápido</h3>
+      <p class="text-sm mt-2 text-muted">Documentación y políticas.</p>
+    </aside>
+
+    <main>
+      <div class="perfil">
+        <div class="portada">
+          <div class="foto-perfil"></div>
+        </div>
+        <div class="info">
+          <h2>OO - PREGRAMER</h2>
+          <p>Experto en Frontend y Arquitectura.</p>
+          <div class="datos">
+            <div class="dato"><strong>Ubicación:</strong> Tlaxcala, México</div>
+            <div class="dato"><strong>Status:</strong> Buscando nuevos proyectos</div>
+          </div>
+        </div>
+      </div>
+
+      <section id="content-area">
+        <h2 style="color:var(--accent);">Documentación Profesional</h2>
+        <p>Selecciona un archivo Markdown de la parte superior para ver mi CV, términos de servicio o información de contrataciones. Este es el enfoque puramente profesional.</p>
+      </section>
+    </main>
+
+    <aside>
+      <h3>Mis Logros</h3>
+      <p class="text-sm mt-2 mb-4 text-muted">Mi trabajo se basa en el rendimiento y la legibilidad del código. ¡Échale un ojo a mi Currículum!</p>
+    </aside>
+  </div>
+
+<script>
+    // --- DATOS SIMULADOS PARA LAS VISTAS PREVIAS (SOLO MD) ---
+    const SIMULATED_FILES = {
+        'docs/CONTRATACIONES.md': 
+            '## Servicios de Desarrollo\n\nActualmente ofrezco servicios de desarrollo **Frontend** (React, Vanilla JS) y análisis de arquitectura. Priorizo la comunicación clara y la entrega a tiempo. Contáctame para discutir tu proyecto.',
+        
+        'docs/PROFESSIONAL.md': 
+            '# Currículum Vitae: OO - PREGRAMER\n\n**Experiencia:** 5 años en desarrollo web, con énfasis en aplicaciones de una sola página (SPA). **Habilidades Clave:** JavaScript, Arquitectura Modular, HTML/CSS. Mi enfoque está en la **usabilidad y el rendimiento**.\n\n### Proyectos Destacados\n\n- Analizador de Repositorios (Este mismo proyecto)\n- Sistemas de Perfil Modular',
+        
+        'docs/terminos.md': 
+            '## Términos Generales del Servicio\n\nTodo el código desarrollado es de propiedad intelectual del cliente una vez finalizado el pago. Los proyectos se entregan en formato de repositorio privado. Cualquier solicitud de cambio importante post-entrega será considerada un proyecto nuevo.'
+    };
+
+    const contentArea = document.getElementById('content-area');
+
+    // Función básica para simular la conversión de Markdown a HTML
+    function simulateMarkdown(md) {
+        let html = md;
+        
+        // 1. Reemplazar encabezados
+        html = html.replace(/^#\s+(.*)$/gm, '<h1>$1</h1>');
+        html = html.replace(/^##\s+(.*)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^###\s+(.*)$/gm, '<h3>$1</h3>');
+        
+        // 2. Reemplazar negritas
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // 3. Reemplazar saltos de línea doble por un párrafo (simplificado)
+        html = html.split('\n\n').map(p => {
+            if (p.trim() && !p.startsWith('<h')) {
+                return `<p>${p.trim()}</p>`;
+            }
+            return p;
+        }).join('');
+        
+        return html;
+    }
+
+    // Carga un archivo Markdown simulado y lo convierte a HTML
+    function loadMarkdown(path) {
+        if (!path) return;
+        
+        const mdContent = SIMULATED_FILES[path];
+        if (mdContent) {
+            contentArea.innerHTML = simulateMarkdown(mdContent);
+        } else {
+            contentArea.innerHTML =
+                '<p style="color:red">ERROR: Contenido Markdown simulado no encontrado para esa ruta.</p>';
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // 1. Botones Markdown
+    document.querySelectorAll('.header-md button').forEach(btn => {
+      btn.addEventListener('click', () => loadMarkdown(btn.dataset.path));
+    });
+
+    // 2. Select .md
+    document.getElementById('md-select').addEventListener('change', e => {
+      loadMarkdown(e.target.value);
+    });
+
+    // Carga el contenido de CV por defecto al iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        loadMarkdown('docs/PROFESSIONAL.md');
+    });
+</script>
+</body>
+</html>
