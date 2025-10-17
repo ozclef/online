@@ -1,0 +1,241 @@
+<!-- Este archivo se dedica a mostrar los feeds de contenido temático (videos/publicaciones) -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>OO - Feeds de Contenido</title>
+
+    <style>
+        :root {
+            --bg: #0f1115;
+            --card: #16181c;
+            --accent: #6ce6b6;
+            --muted: #9aa0a6;
+            --text-light: #eaf7f0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-light);
+            padding-top: 50px;
+        }
+        
+        /* Contenedor Principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Título Principal */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--accent);
+            border-bottom: 2px solid rgba(108, 230, 182, 0.2);
+            padding-bottom: 10px;
+        }
+
+        /* Navegación de Categorías */
+        .category-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .category-nav button {
+            background: var(--card);
+            color: var(--text-light);
+            border: 1px solid var(--muted);
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .category-nav button:hover, .category-nav button.active {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Grid de Videos */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        /* Tarjeta de Video */
+        .video-card {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+        .video-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+        }
+
+        .video-preview {
+            height: 180px;
+            background-color: #1f2937; /* Gris oscuro para simular el embed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+        .video-info h3 {
+            color: var(--accent);
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .video-info p {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+        
+        .video-info a {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--bg);
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-header">Analizador de Feeds de Video</h1>
+        
+        <nav class="category-nav">
+            <button class="js-category-button active" data-category="all">Feed Global</button>
+            <button class="js-category-button" data-category="filosofia">Filosofía</button>
+            <button class="js-category-button" data-category="terror">Terror Videos</button>
+            <button class="js-category-button" data-category="happy">RIE !</button>
+        </nav>
+
+        <main id="video-content" class="video-grid">
+            <!-- Las tarjetas de video serán insertadas aquí por JavaScript -->
+        </main>
+    </div>
+
+<script>
+    // --- DATOS SIMULADOS PARA LOS FEEDS DE VIDEO ---
+    const VIDEO_FEEDS = {
+        filosofia: [
+            { title: "Arquitectura vs. Código Rápido", category: "Filosofía", description: "Un análisis sobre por qué la estructura modular supera la velocidad en proyectos a largo plazo.", source: "YouTube - Arquitectura" },
+            { title: "El Minimalismo en HTML", category: "Filosofía", description: "Explorando cómo menos etiquetas pueden llevar a más rendimiento y claridad.", source: "Blog - HTML" }
+        ],
+        terror: [
+            { title: "Ritmo Narrativo del Miedo", category: "Terror", description: "Estudio sobre cómo el audio y el CLS (Cambio de Diseño Acumulativo) pueden usarse para generar tensión en un sitio web.", source: "Simulación de Audio" },
+            { title: "Sombras y UX Oscura", category: "Terror", description: "Una mirada a cómo los temas oscuros manipulan la percepción visual y la experiencia del usuario.", source: "YouTube - UX" }
+        ],
+        happy: [
+            { title: "Animaciones CSS que Alegran", category: "RIE !", description: "Ejemplos de animaciones sencillas y efectivas para mejorar la interacción sin sacrificar rendimiento.", source: "Codepen" },
+            { title: "Tips para Desestresarse del Código", category: "RIE !", description: "Una recopilación de consejos y herramientas ligeras para mantener la moral alta en la programación.", source: "Charla" }
+        ]
+    };
+
+    const videoContentEl = document.getElementById('video-content');
+    const categoryButtons = document.querySelectorAll('.js-category-button');
+
+    function createVideoCard(video) {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.setAttribute('data-category', video.category.toLowerCase().replace(/ /g, ''));
+
+        card.innerHTML = `
+            <div class="video-preview">
+                Vista Previa de Video | ${video.category}
+            </div>
+            <div class="video-info">
+                <h3>${video.title}</h3>
+                <p>${video.description}</p>
+                <a href="#">Ver Análisis de ${video.source}</a>
+            </div>
+        `;
+        return card;
+    }
+
+    function renderFeed(category) {
+        videoContentEl.innerHTML = '';
+        
+        let videosToRender = [];
+        
+        if (category === 'all') {
+            // Si es 'all', combina todos los videos en una sola lista
+            videosToRender = [
+                ...VIDEO_FEEDS.filosofia,
+                ...VIDEO_FEEDS.terror,
+                ...VIDEO_FEEDS.happy
+            ];
+        } else {
+            videosToRender = VIDEO_FEEDS[category] || [];
+        }
+
+        if (videosToRender.length === 0) {
+            videoContentEl.innerHTML = '<p style="text-align:center; color:var(--muted); padding: 40px;">No hay publicaciones en esta categoría.</p>';
+            return;
+        }
+
+        videosToRender.forEach(video => {
+            videoContentEl.appendChild(createVideoCard(video));
+        });
+    }
+
+    function updateActiveButton(activeCategory) {
+        categoryButtons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-category') === activeCategory) {
+                btn.classList.add('active');
+            }
+        });
+    }
+
+    // Event Listeners para los botones de categoría
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const category = button.getAttribute('data-category');
+            renderFeed(category);
+            updateActiveButton(category);
+        });
+    });
+
+    // Cargar el feed global al iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        renderFeed('all');
+        updateActiveButton('all');
+    });
+</script>
+</body>
+</html>
